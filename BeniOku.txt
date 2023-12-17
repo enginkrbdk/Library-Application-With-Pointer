@@ -1,2 +1,7 @@
-Program visual studio 2019 da ileriprogrammingproject.sln tıklayarak açılır
+Program visual studio 2019 da IleriProgrammingProject.sln tıklayarak solution açılır
+Local Windwos Debugger tıklayarak çalıştırılır.
+
+Ya da Visual Studio Code üzerinde MainClass.c ekranında sağ tıklayıp run code 
+dediğimizde proje derlenmektedir.
+
 
