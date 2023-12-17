@@ -1,0 +1,2 @@
+Program visual studio 2019 da ileriprogrammingproject.sln tıklayarak açılır
+

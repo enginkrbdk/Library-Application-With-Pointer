@@ -113,32 +113,57 @@ void dosyadanOku(Kitap kitaplar[], Uye uyeler[], Odunc oduncVerilen[], KitapRafi
         return;
     }
 
-    fscanf(dosya, "%d", kitapSayisi);
-    for (int i = 0; i < *kitapSayisi; i++) {
-        fscanf(dosya, "%d %s %s", &kitaplar[i].id, kitaplar[i].ad, kitaplar[i].yazar);
+    char buffer[100];  // A buffer to read section headers
+
+    // Read books
+    fscanf(dosya, "%s", buffer);
+    if (strcmp(buffer, "Kitaplar") == 0) {
+        fscanf(dosya, "%d", kitapSayisi);
+        for (int i = 0; i < *kitapSayisi; i++) {
+            fscanf(dosya, "%d", &kitaplar[i].id);
+            fscanf(dosya, " %[^\n]", kitaplar[i].ad);
+            fscanf(dosya, " %[^\n]", kitaplar[i].yazar);
+        }
     }
 
-    fscanf(dosya, "%d", uyeSayisi);
-    for (int i = 0; i < *uyeSayisi; i++) {
-        fscanf(dosya, "%d %s", &uyeler[i].uye_id, uyeler[i].ad);
+    // Read members
+    fscanf(dosya, "%s", buffer);
+    if (strcmp(buffer, "Uyeler") == 0) {
+        fscanf(dosya, "%d", uyeSayisi);
+        for (int i = 0; i < *uyeSayisi; i++) {
+            fscanf(dosya, "%d", &uyeler[i].uye_id);
+            fscanf(dosya, " %[^\n]", uyeler[i].ad);
+        }
     }
 
-    fscanf(dosya, "%d", oduncSayisi);
-    for (int i = 0; i < *oduncSayisi; i++) {
-        fscanf(dosya, "%d %d", &oduncVerilen[i].kitap_id, &oduncVerilen[i].uye_id);
+    // Read borrowed books
+    fscanf(dosya, "%s", buffer);
+    if (strcmp(buffer, "Odunc") == 0) {
+        fscanf(dosya, "%d", oduncSayisi);
+        for (int i = 0; i < *oduncSayisi; i++) {
+            fscanf(dosya, "%d %d", &oduncVerilen[i].kitap_id, &oduncVerilen[i].uye_id);
+        }
     }
 
-    fscanf(dosya, "%d", rafSayisi);
-    for (int i = 0; i < *rafSayisi; i++) {
-        fscanf(dosya, "%d", &raflar[i].raf_id);
-        fscanf(dosya, "%d", &raflar[i].kitapSayisi);
-        for (int j = 0; j < raflar[i].kitapSayisi; j++) {
-            fscanf(dosya, "%d %s %s", &raflar[i].kitaplar[j].id, raflar[i].kitaplar[j].ad, raflar[i].kitaplar[j].yazar);
+    // Read shelves
+    fscanf(dosya, "%s", buffer);
+    if (strcmp(buffer, "Raflar") == 0) {
+        fscanf(dosya, "%d", rafSayisi);
+        for (int i = 0; i < *rafSayisi; i++) {
+            fscanf(dosya, "%d %d", &raflar[i].raf_id, &raflar[i].kitapSayisi);
+            for (int j = 0; j < raflar[i].kitapSayisi; j++) {
+                fscanf(dosya, "%d", &raflar[i].kitaplar[j].id);
+                fscanf(dosya, " %[^\n]", raflar[i].kitaplar[j].ad);
+                fscanf(dosya, " %[^\n]", raflar[i].kitaplar[j].yazar);
+            }
         }
     }
 
     fclose(dosya);
 }
+
+
+
 
 void dosyayaYaz(Kitap kitaplar[], Uye uyeler[], Odunc oduncVerilen[], KitapRafi raflar[], int kitapSayisi, int uyeSayisi, int oduncSayisi, int rafSayisi) {
     FILE* dosya = fopen("kutuphane.txt", "w");
@@ -148,32 +173,46 @@ void dosyayaYaz(Kitap kitaplar[], Uye uyeler[], Odunc oduncVerilen[], KitapRafi 
         return;
     }
 
+    // Write books
+    fprintf(dosya, "Kitaplar\n");
     fprintf(dosya, "%d\n", kitapSayisi);
     for (int i = 0; i < kitapSayisi; i++) {
-        fprintf(dosya, "%d %s %s\n", kitaplar[i].id, kitaplar[i].ad, kitaplar[i].yazar);
+        fprintf(dosya, "%d\n", kitaplar[i].id);
+        fprintf(dosya, "%s\n", kitaplar[i].ad);
+        fprintf(dosya, "%s\n", kitaplar[i].yazar);
     }
 
+    // Write members
+    fprintf(dosya, "Uyeler\n");
     fprintf(dosya, "%d\n", uyeSayisi);
     for (int i = 0; i < uyeSayisi; i++) {
-        fprintf(dosya, "%d %s\n", uyeler[i].uye_id, uyeler[i].ad);
+        fprintf(dosya, "%d\n", uyeler[i].uye_id);
+        fprintf(dosya, "%s\n", uyeler[i].ad);
     }
 
+    // Write borrowed books
+    fprintf(dosya, "Odunc\n");
     fprintf(dosya, "%d\n", oduncSayisi);
     for (int i = 0; i < oduncSayisi; i++) {
         fprintf(dosya, "%d %d\n", oduncVerilen[i].kitap_id, oduncVerilen[i].uye_id);
     }
 
+    // Write shelves
+    fprintf(dosya, "Raflar\n");
     fprintf(dosya, "%d\n", rafSayisi);
     for (int i = 0; i < rafSayisi; i++) {
-        fprintf(dosya, "%d\n", raflar[i].raf_id);
-        fprintf(dosya, "%d\n", raflar[i].kitapSayisi);
+        fprintf(dosya, "%d %d\n", raflar[i].raf_id, raflar[i].kitapSayisi);
         for (int j = 0; j < raflar[i].kitapSayisi; j++) {
-            fprintf(dosya, "%d %s %s\n", raflar[i].kitaplar[j].id, raflar[i].kitaplar[j].ad, raflar[i].kitaplar[j].yazar);
+            fprintf(dosya, "%d\n", raflar[i].kitaplar[j].id);
+            fprintf(dosya, "%s\n", raflar[i].kitaplar[j].ad);
+            fprintf(dosya, "%s\n", raflar[i].kitaplar[j].yazar);
         }
     }
 
     fclose(dosya);
 }
+
+
 
 void menuGoster() {
     printf("\n--- KUTUPHANE OTOMASYONU ---\n");
@@ -183,7 +222,7 @@ void menuGoster() {
     printf("4. Kitap Listele\n");
     printf("5. Uye Listele\n");
     printf("6. Odunc Listele\n");
-    printf("7. Kitap �ade\n");
+    printf("7. Kitap iade\n");
     printf("8. Raf Ekle\n");
     printf("9. Kitabi Rafa Ekle\n");
     printf("10. Raf Listele\n");
@@ -191,12 +230,14 @@ void menuGoster() {
 }
 
 void kitapEkle(Kitap kitaplar[], int* kitapSayisi) {
-    // Kitap ekleme islemleri
+    // Kitap ekleme işlemleri
     if (*kitapSayisi < MAX_KITAP_SAYISI) {
         printf("Kitap Adi: ");
-        scanf("%s", kitaplar[*kitapSayisi].ad);
+        scanf(" %49[^\n]", kitaplar[*kitapSayisi].ad); // Boşluk karakterini kullanarak boşluk içeren girişlere izin verir
+
         printf("Yazar: ");
-        scanf("%s", kitaplar[*kitapSayisi].yazar);
+        scanf(" %49[^\n]", kitaplar[*kitapSayisi].yazar); // Boşluk karakterini kullanarak boşluk içeren girişlere izin verir
+
         kitaplar[*kitapSayisi].id = *kitapSayisi + 1;
         (*kitapSayisi)++;
         printf("Kitap basariyla eklendi.\n");
@@ -207,7 +248,6 @@ void kitapEkle(Kitap kitaplar[], int* kitapSayisi) {
 }
 
 void uyeEkle(Uye uyeler[], int* uyeSayisi) {
-    // uye ekleme islemleri
     if (*uyeSayisi < MAX_UYE_SAYISI) {
         printf("Uye Adi: ");
         scanf("%s", uyeler[*uyeSayisi].ad);
@@ -223,8 +263,10 @@ void uyeEkle(Uye uyeler[], int* uyeSayisi) {
 void oduncVer(Odunc oduncVerilen[], int* oduncSayisi, Kitap kitaplar[], Uye uyeler[], int kitapSayisi, int uyeSayisi) {
     // odunc verme islemleri
     if (*oduncSayisi < MAX_ODUNC_VERILEN_SAYISI) {
-        int kitapID, uyeID;
+        // Kitap ID seçimi
+        kitapListele(kitaplar, kitapSayisi);
         printf("Kitap ID: ");
+        int kitapID;
         scanf("%d", &kitapID);
 
         // Kitap ID kontrol
@@ -232,8 +274,22 @@ void oduncVer(Odunc oduncVerilen[], int* oduncSayisi, Kitap kitaplar[], Uye uyel
             printf("Gecersiz kitap ID'si. Lutfen tekrar deneyin.\n");
             return;
         }
-        uyeListele(uyeler,uyeSayisi);
+
+        // Kitapın ödünç verilip verilmediğini kontrol et
+        for (int i = 0; i < *oduncSayisi; i++) {
+            if (oduncVerilen[i].kitap_id == kitapID) {
+                printf("Bu kitap zaten odunc verilmis. Lutfen baska bir kitap secin.\n");
+                return;
+            }
+        }
+
+        // Odunc verilen kitap ve uye bilgilerini kaydet
+        oduncVerilen[*oduncSayisi].kitap_id = kitapID;
+
+        // Uye ID seçimi
+        uyeListele(uyeler, uyeSayisi);
         printf("Uye ID: ");
+        int uyeID;
         scanf("%d", &uyeID);
 
         // Uye ID kontrol
@@ -242,28 +298,15 @@ void oduncVer(Odunc oduncVerilen[], int* oduncSayisi, Kitap kitaplar[], Uye uyel
             return;
         }
 
-        // Odunc verilen kitap kontrol
-        for (int i = 0; i < *oduncSayisi; i++) {
-            if (oduncVerilen[i].kitap_id == kitapID) {
-                printf("Bu kitap zaten odunc verilmis. Lutfen baska bir kitap secin.\n");
-                kitapListele(kitaplar, kitapSayisi);
-                printf("Kitap ID: ");
-                scanf("%d", &kitapID);
-                //return;
-            }
-        }
-
-        // Odunc verilen kitap ve uye bilgilerini kaydet
-        oduncVerilen[*oduncSayisi].kitap_id = kitapID;
         oduncVerilen[*oduncSayisi].uye_id = uyeID;
         (*oduncSayisi)++;
-
         printf("Odunc verme islemi basariyla gerceklesti.\n");
     }
     else {
         printf("Odunc verme limitine ulasildi. Daha fazla odunc verilemez.\n");
     }
 }
+
 void kitapListele(Kitap kitaplar[], int kitapSayisi) {
     printf("\n--- KITAP LISTESI ---\n");
     for (int i = 0; i < kitapSayisi; i++) {
